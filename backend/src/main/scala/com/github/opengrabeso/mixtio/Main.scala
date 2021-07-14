@@ -5,23 +5,17 @@ import java.security.MessageDigest
 import java.util
 import java.util.Properties
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-
 import com.google.api.client.http.{GenericUrl, HttpRequest}
 import com.google.api.client.http.json.JsonHttpContent
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.json.gson.GsonFactory
 
 import scala.collection.JavaConverters._
 import common.Util._
 import common.model._
 import shared.Timing
 
-import scala.annotation.tailrec
-import scala.collection.immutable
 import scala.collection.immutable.SortedMap
-import scala.util.control.Breaks._
-import scala.xml.Node
 
 object Main extends common.Formatting {
 
@@ -73,7 +67,7 @@ object Main extends common.Formatting {
   }
 
   private def authRequest(json: util.HashMap[String, String]): JsonNode = {
-    val content = new JsonHttpContent(new JacksonFactory(), json)
+    val content = new JsonHttpContent(new GsonFactory(), json)
 
     val request = requestFactory.buildPostRequest(new GenericUrl("https://www.strava.com/oauth/token"), content)
     val response = try {

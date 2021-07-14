@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.api.client.http.{GenericUrl, HttpContent, HttpRequest, HttpRequestInitializer}
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonObjectParser
-import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.json.gson.GsonFactory
 
 object RequestUtils {
   private val transport = new NetHttpTransport()
-  val jsonFactory = new JacksonFactory()
+  val jsonFactory = new GsonFactory()
   val jsonMapper = new ObjectMapper()
 
   val requestFactory = transport.createRequestFactory(new HttpRequestInitializer() {
