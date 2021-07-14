@@ -139,11 +139,12 @@ lazy val backend = (project in file("backend"))
     commonSettings,
 
     libraryDependencies ++= commonLibs ++ jvmLibs ++ Seq(
-      "com.google.http-client" % "google-http-client-appengine" % "1.31.0",
-      "com.google.http-client" % "google-http-client-jackson2" % "1.31.0",
-      "com.google.apis" % "google-api-services-storage" % "v1-rev158-1.25.0",
-      "com.google.appengine.tools" % "appengine-gcs-client" % "0.8" exclude("javax.servlet", "servlet.api"),
-      "com.google.cloud" % "google-cloud-storage" % "1.96.0",
+      "com.google.http-client" % "google-http-client-appengine" % "1.39.0",
+      "com.google.http-client" % "google-http-client-jackson2" % "1.39.0",
+      "com.google.apis" % "google-api-services-storage" % "v1-rev171-1.25.0",
+      "com.google.appengine.tools" % "appengine-gcs-client" % "0.8.1" exclude("javax.servlet", "servlet.api"),
+      "com.google.cloud" % "google-cloud-storage" % "1.118.0",
+      "com.google.cloud" % "google-cloud-tasks" % "1.29.1",
 
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
