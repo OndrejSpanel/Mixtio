@@ -21,7 +21,7 @@ trait ActivityStorage {
     // are any metadata needed?
     Storage.store(namespace.upload(sessionId), uniqueName, auth.userId, uploadFiltered.header, uploadFiltered)
 
-    BackgroundTasks.addTask(UploadResultToStrava(uniqueName, auth, sessionId))
+    BackgroundTasks.addTask(UploadResultToStrava(auth, sessionId), uniqueName, System.currentTimeMillis())
 
     val uploadResultNamespace = Main.namespace.uploadResult(sessionId)
     val uploadId = Storage.FullName(uploadResultNamespace, uniqueName, auth.userId).name

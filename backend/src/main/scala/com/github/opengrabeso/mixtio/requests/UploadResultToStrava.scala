@@ -1,10 +1,8 @@
 package com.github.opengrabeso.mixtio
 package requests
 
-import com.google.api.client.http.HttpResponseException
 import com.google.appengine.api.taskqueue._
 
-import scala.util.{Failure, Success}
 import scala.xml.NodeSeq
 
 sealed trait UploadStatus {
@@ -35,10 +33,9 @@ case class UploadError(ex: Throwable) extends UploadStatus {
 // background push queue task
 
 @SerialVersionUID(10L)
-case class UploadResultToStrava(key: String, auth: Main.StravaAuthResult, sessionId: String) extends DeferredTask {
+case class UploadResultToStrava(auth: Main.StravaAuthResult, sessionId: String) extends BackgroundTasks.TaskDescription[String] {
 
-  def run()= {
-
+  def execute(key: String)= {
     val api = new strava.StravaAPI(auth.token)
 
     val uploadNamespace = Main.namespace.upload(sessionId)
@@ -55,43 +52,37 @@ case class UploadResultToStrava(key: String, auth: Main.StravaAuthResult, sessio
         case UploadInProgress(uploadId) =>
           println(s"Upload started $uploadId")
           Storage.store(Storage.FullName(uploadResultNamespace, key, auth.userId), UploadInProgress(uploadId))
-          val eta = System.currentTimeMillis() + 3000
-          BackgroundTasks.addTask(WaitForStravaUpload(key, uploadId, auth, eta, sessionId))
+          val eta = System.currentTimeMillis() + 1000
+          BackgroundTasks.addTask(WaitForStravaUpload(auth, sessionId), (key, uploadId), eta)
         case done =>
           Storage.store(Storage.FullName(uploadResultNamespace, key, auth.userId), done)
       }
       Storage.delete(Storage.FullName(uploadNamespace, key, auth.userId))
     }
-
   }
+
+  override def path = s"/rest/user/${auth.userId}/strava/{$sessionId}/uploadFile"
 
 }
 
-case class WaitForStravaUpload(key: String, id: Long, auth: Main.StravaAuthResult, eta: Long, sessionId: String) extends DeferredTask {
-  private def retry(nextEta: Long) = {
-    BackgroundTasks.addTask(WaitForStravaUpload(key, id, auth, nextEta, sessionId))
-  }
+case class WaitForStravaUpload(auth: Main.StravaAuthResult, sessionId: String) extends BackgroundTasks.TaskDescription[(String, Long)] {
 
-  def run() = {
+  def execute(pars: (String, Long)) = {
+    val (key, id) = pars
     // check if the upload has finished
-    // Strava recommends polling no more than once a second
-    val now = System.currentTimeMillis()
-    if (now < eta) {
-      retry(eta)
-    } else {
-      val api = new strava.StravaAPI(auth.token)
-      val uploadResultNamespace = Main.namespace.uploadResult(sessionId)
-      val done = api.activityIdFromUploadId(id)
-      done match {
-        case UploadInProgress(_) =>
-          // still processing - retry
-          retry(now + 2000)
-        case _ =>
-          Storage.store(Storage.FullName(uploadResultNamespace, key, auth.userId), done)
-
-      }
+    val api = new strava.StravaAPI(auth.token)
+    val uploadResultNamespace = Main.namespace.uploadResult(sessionId)
+    val done = api.activityIdFromUploadId(id)
+    done match {
+      case UploadInProgress(_) =>
+        // still processing - retry
+        val now = System.currentTimeMillis()
+        BackgroundTasks.addTask(this, (key, id), now + 2000)
+      case _ =>
+        Storage.store(Storage.FullName(uploadResultNamespace, key, auth.userId), done)
 
     }
   }
 
+  override def path = s"/rest/user/${auth.userId}/strava/{$sessionId}/waitForUpload"
 }
