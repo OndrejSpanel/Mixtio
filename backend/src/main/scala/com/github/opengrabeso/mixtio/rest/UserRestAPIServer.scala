@@ -265,6 +265,4 @@ class UserRestAPIServer(val userAuth: Main.StravaAuthResult) extends UserRestAPI
     }
 
   }
-
-  override def strava(sessionId: String): StravaRestAPI = new StravaRestAPIServer(userAuth, sessionId)
 }

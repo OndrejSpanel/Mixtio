@@ -45,8 +45,6 @@ trait UserRestAPI {
 
   // upload a file to Mixtio
   @CustomBody def upload(files: HttpBody): Future[Seq[ActivityHeader]]
-
-  def strava(sessionId: String): StravaRestAPI
 }
 
 object UserRestAPI extends RestApiCompanion[EnhancedRestImplicits,UserRestAPI](EnhancedRestImplicits)

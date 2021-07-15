@@ -61,8 +61,7 @@ case class UploadResultToStrava(auth: Main.StravaAuthResult, sessionId: String) 
     }
   }
 
-  override def path = s"/rest/user/${auth.userId}/strava/$sessionId/uploadFile"
-
+  override def path = s"/rest/strava/${auth.userId}/${auth.token}/${auth.sessionId}/uploadFile"
 }
 
 case class WaitForStravaUpload(auth: Main.StravaAuthResult, sessionId: String) extends BackgroundTasks.TaskDescription[(String, Long)] {
@@ -84,5 +83,5 @@ case class WaitForStravaUpload(auth: Main.StravaAuthResult, sessionId: String) e
     }
   }
 
-  override def path = s"/rest/user/${auth.userId}/strava/$sessionId/waitForUpload"
+  override def path = s"/rest/strava/${auth.userId}/${auth.token}/${auth.sessionId}/waitForUpload"
 }

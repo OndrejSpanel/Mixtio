@@ -29,13 +29,4 @@ trait ActivityStorage {
     uploadId
 
   }
-
-  def uploadMultiple(merged: Seq[ActivityEvents])(auth: StravaAuthResult, sessionId: String): Seq[String] = {
-    // store everything into a session storage, and make background tasks to upload it to Strava
-
-    for (activity <- merged) yield {
-      upload(activity)(auth, sessionId)
-    }
-  }
-
 }

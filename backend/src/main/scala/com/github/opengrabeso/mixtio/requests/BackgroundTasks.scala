@@ -1,11 +1,16 @@
 package com.github.opengrabeso.mixtio
 package requests
 
-import java.util.concurrent.{ConcurrentLinkedQueue, PriorityBlockingQueue, Semaphore, ThreadFactory}
+import com.avsystem.commons.JStringBuilder
+import com.avsystem.commons.serialization.GenCodec
+import com.avsystem.commons.serialization.json.JsonStringOutput
+
+import java.util.concurrent.{PriorityBlockingQueue, ThreadFactory}
 import com.google.appengine.api.ThreadManager
 import com.google.appengine.api.utils.SystemProperty
 import com.google.cloud.tasks.v2._
-import com.google.protobuf.ByteString
+import com.google.protobuf.{ByteString, Timestamp}
+import collection.JavaConverters._
 
 import java.nio.charset.Charset
 
@@ -17,7 +22,7 @@ object BackgroundTasks {
   }
 
   trait Tasks {
-    def addTask[T](t: TaskDescription[T], pars: T, eta: Long): Unit
+    def addTask[T: GenCodec](t: TaskDescription[T], pars: T, eta: Long): Unit
   }
 
   object LocalTaskQueue extends Runnable with Tasks with ThreadFactory {
@@ -38,27 +43,27 @@ object BackgroundTasks {
     thread.setDaemon(true)
     thread.start()
 
-    def addTask[T](t: TaskDescription[T], pars: T, eta: Long) = {
+    def addTask[T: GenCodec](t: TaskDescription[T], pars: T, eta: Long) = {
       if (logging) println(s"addTask ${t.path}, $eta (${eta - System.currentTimeMillis()} from now)")
       q.add(QueueItem(t, pars, eta))
     }
 
     @scala.annotation.tailrec
     def run() = {
-      val QueueItem(task, pars, eta) = q.take()
+      val item = q.take()
       val now = System.currentTimeMillis()
-      if (eta > now) {
+      if (item.eta > now) {
         if (logging) {
-          println(s"Queue wait ${eta - now}")
+          println(s"Queue wait ${item.eta - now}")
         }
         // even the most urgent task is not needed yet, wait for a while before trying again
         // not very sophisticated, but should work reasonably well
         Thread.sleep(100)
-        q.add(QueueItem(task, pars, eta))
+        q.add(item)
       } else {
-        if (logging) println(s"Run task ${task.path}")
+        if (logging) println(s"Run task ${item.task.path}")
         try {
-          task.asInstanceOf[TaskDescription[Any]].execute(pars)
+          item.task.asInstanceOf[TaskDescription[Any]].execute(item.pars)
         } catch {
           case ex: Exception =>
             println("Exception while processing a task")
@@ -76,31 +81,43 @@ object BackgroundTasks {
   object CloudTaskQueue extends Tasks {
     val client = CloudTasksClient.create()
 
-    def addTask[T](task: TaskDescription[T], pars: T, eta: Long): Unit = {
+    def addTask[T: GenCodec](task: TaskDescription[T], pars: T, eta: Long): Unit = {
       // see https://cloud.google.com/tasks/docs/creating-appengine-tasks
       // TODO: obtain location from some configuration / API?
       val queuePath = QueueName.of("mixtio", "europe-west3", "default").toString
+      val codec = implicitly[GenCodec[T]]
 
-      /*
+      val builder = new JStringBuilder
+      val output = new JsonStringOutput(builder)
+      codec.write(output, pars)
+      val body =
+        s"""{
+           |"pars" : ${builder.toString}
+           |}""".stripMargin
+
       val taskBuilder = Task.newBuilder()
           .setAppEngineHttpRequest(
             AppEngineHttpRequest.newBuilder()
-              .setBody(ByteString.copyFrom(payload, Charset.defaultCharset()))
-              .setRelativeUri("/tasks/create")
+              .setBody(ByteString.copyFrom(body, Charset.defaultCharset()))
+              .putAllHeaders(Map("Content-Type" -> "application/json").asJava)
+              .setRelativeUri(task.path)
               .setHttpMethod(HttpMethod.POST)
               .build()
           )
-      */
-      //val queue = QueueFactory.getDefaultQueue
-      //queue add TaskOptions.Builder.withPayload(task)
-      ???
+
+      val now = System.currentTimeMillis()
+      if (eta > now) {
+        taskBuilder.setScheduleTime(Timestamp.newBuilder.setSeconds(eta / 1000))
+      }
+
+      val cloudTask = client.createTask(queuePath, taskBuilder.build)
     }
   }
 
   // Cloud tasks are suppoted only on the real (production) environment
   private val appEngine = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production
 
-  def addTask[T](task: TaskDescription[T], pars: T, eta: Long): Unit = {
+  def addTask[T: GenCodec](task: TaskDescription[T], pars: T, eta: Long): Unit = {
     if (appEngine) {
       CloudTaskQueue.addTask[T](task, pars, eta)
     } else {

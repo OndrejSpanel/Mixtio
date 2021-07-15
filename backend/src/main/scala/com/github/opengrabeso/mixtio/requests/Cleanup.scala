@@ -10,8 +10,8 @@ import java.time.ZonedDateTime
 object Cleanup extends DefineRequest("/cleanup") {
 
   @SerialVersionUID(10L)
-  case object BackgroundCleanup extends BackgroundTasks.TaskDescription[Unit] {
-    override def execute(u: Unit): Unit = {
+  case object BackgroundCleanup extends BackgroundTasks.TaskDescription[String] {
+    override def execute(dummy: String): Unit = {
       // catch all exceptions, because otherwise the task would be repeated on a failure
       // as the task is periodic, this is not necessary - moreover the failure is most likely
       // caused by a bug and would happen again
@@ -23,7 +23,7 @@ object Cleanup extends DefineRequest("/cleanup") {
           println(s"Exception $ex during cleanup")
       }
     }
-    override def path = "/cleanup"
+    override def path = "/rest/cleanup"
   }
 
 
@@ -31,7 +31,7 @@ object Cleanup extends DefineRequest("/cleanup") {
     val periodic = request.queryParams("periodic")
     if (periodic != null) {
 
-      BackgroundTasks.addTask(BackgroundCleanup, (), System.currentTimeMillis())
+      BackgroundTasks.addTask(BackgroundCleanup, periodic, System.currentTimeMillis())
 
       <cleaned><deferred>Background request initiated</deferred></cleaned>
     } else {

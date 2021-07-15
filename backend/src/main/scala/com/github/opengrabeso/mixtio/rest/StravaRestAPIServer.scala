@@ -5,14 +5,14 @@ import requests.{UploadResultToStrava, WaitForStravaUpload}
 
 class StravaRestAPIServer(val auth: Main.StravaAuthResult, val sessionId: String) extends StravaRestAPI with RestAPIUtils {
 
-  def uploadFile(key: String) = syncResponse {
-    UploadResultToStrava(auth, sessionId).execute(key)
+  def uploadFile(pars: String) = syncResponse {
+    UploadResultToStrava(auth, sessionId).execute(pars)
   }
 
-  def waitForUpload(key: String, id: Long) = syncResponse {
+  def waitForUpload(pars: (String, Long)) = syncResponse {
     // check if the upload has finished
     // Strava recommends polling no more than once a second
-    WaitForStravaUpload(auth, sessionId).execute((key, id))
+    WaitForStravaUpload(auth, sessionId).execute(pars)
   }
 
 }

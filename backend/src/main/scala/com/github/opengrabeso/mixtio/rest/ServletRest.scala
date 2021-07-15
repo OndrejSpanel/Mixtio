@@ -126,6 +126,9 @@ class ServletRest(handleRequest: RawRest.HandleRequest) extends RestServlet(hand
     // async - is it a problem? executed on com.avsystem.commons.concurrent.RunNowEC when the request was using
     RawRest.safeAsync(r) {
       case Success(restResponse) =>
+        if (restResponse.code >= 400) {
+          println(s"response ${restResponse.code}: ${restResponse.body.textualContentOpt}")
+        }
         writeResponse(response, restResponse)
       case Failure(e: HttpErrorException) =>
         writeResponse(response, e.toResponse)
