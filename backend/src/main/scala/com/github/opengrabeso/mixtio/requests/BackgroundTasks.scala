@@ -1,7 +1,7 @@
 package com.github.opengrabeso.mixtio
 package requests
 
-import java.util.concurrent.{ConcurrentLinkedQueue, Semaphore, ThreadFactory}
+import java.util.concurrent.{ConcurrentLinkedQueue, PriorityBlockingQueue, Semaphore, ThreadFactory}
 import com.google.appengine.api.ThreadManager
 import com.google.appengine.api.utils.SystemProperty
 import com.google.cloud.tasks.v2._
@@ -21,8 +21,17 @@ object BackgroundTasks {
   }
 
   object LocalTaskQueue extends Runnable with Tasks with ThreadFactory {
-    val q = new ConcurrentLinkedQueue[(TaskDescription[_], Any, Long)]
-    val issued = new Semaphore(0)
+    private val logging = false
+
+    case class QueueItem(task: TaskDescription[_], pars: Any, eta: Long) extends Comparable[QueueItem] {
+      override def compareTo(o: QueueItem) = {
+        if (this.eta < o.eta) -1
+        else if (this.eta > o.eta) +1
+        else 0
+      }
+    }
+
+    val q = new PriorityBlockingQueue[QueueItem]
 
     // initialization will be called on a first access (when first task is added)
     val thread = new Thread(this)
@@ -30,29 +39,33 @@ object BackgroundTasks {
     thread.start()
 
     def addTask[T](t: TaskDescription[T], pars: T, eta: Long) = {
-      q.add((t, pars, eta))
-      issued.release()
+      if (logging) println(s"addTask ${t.path}, $eta (${eta - System.currentTimeMillis()} from now)")
+      q.add(QueueItem(t, pars, eta))
     }
 
     @scala.annotation.tailrec
     def run() = {
-      issued.acquire(1)
-      val t = q.poll()
-      t match {
-        case (task, pars, eta) =>
-          val now = System.currentTimeMillis()
-          if (eta > now) {
-            q.add((task, pars, eta))
-          }
-          try {
-            task.asInstanceOf[TaskDescription[Any]].execute(pars)
-          } catch {
-            case ex: Exception =>
-              println("Exception while processing a task")
-              ex.printStackTrace()
-          }
-          run()
+      val QueueItem(task, pars, eta) = q.take()
+      val now = System.currentTimeMillis()
+      if (eta > now) {
+        if (logging) {
+          println(s"Queue wait ${eta - now}")
+        }
+        // even the most urgent task is not needed yet, wait for a while before trying again
+        // not very sophisticated, but should work reasonably well
+        Thread.sleep(100)
+        q.add(QueueItem(task, pars, eta))
+      } else {
+        if (logging) println(s"Run task ${task.path}")
+        try {
+          task.asInstanceOf[TaskDescription[Any]].execute(pars)
+        } catch {
+          case ex: Exception =>
+            println("Exception while processing a task")
+            ex.printStackTrace()
+        }
       }
+      run()
     }
     def newThread(r: Runnable) = {
       val thread = new Thread(r)
@@ -84,7 +97,8 @@ object BackgroundTasks {
     }
   }
 
-  private val appEngine = SystemProperty.environment.value() != null
+  // Cloud tasks are suppoted only on the real (production) environment
+  private val appEngine = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production
 
   def addTask[T](task: TaskDescription[T], pars: T, eta: Long): Unit = {
     if (appEngine) {
