@@ -122,7 +122,6 @@ lazy val frontend = project.settings(
     .dependsOn(sharedJs_JS)
 
 lazy val backend = (project in file("backend"))
-  .disablePlugins(sbtassembly.AssemblyPlugin)
   .dependsOn(core)
   .settings(
 
@@ -165,7 +164,25 @@ lazy val backend = (project in file("backend"))
       ),
       "org.apache.commons" % "commons-math" % "2.1",
       "commons-io" % "commons-io" % "2.1"
-    )
+    ),
+
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "MANIFEST.MF") =>
+        MergeStrategy.discard
+      case PathList(ps @ _*) if ps.nonEmpty && Seq("io.netty.versions.properties", "module-info.class", "nowarn$.class", "nowarn.class").contains(ps.last) =>
+        MergeStrategy.first
+      case PathList("javax", "servlet", _*) =>
+        MergeStrategy.first
+      case PathList("META-INF", ps @ _*) if ps.nonEmpty && Seq("native-image.properties", "reflection-config.json").contains(ps.last) =>
+        MergeStrategy.first
+      case x =>
+        // default handling for things like INDEX.LIST (see https://stackoverflow.com/a/46287790/16673)
+        val oldStrategy = (assembly / assemblyMergeStrategy).value
+        oldStrategy(x)
+    },
+
+    assembly / assemblyJarName := "mixtio.jar",
+    assembly / mainClass := Some("com.github.opengrabeso.mixtio.DevServer")
   )
 
 lazy val root = (project in file(".")).aggregate(backend).settings(
