@@ -109,7 +109,7 @@ class StravaAPI(authString: String) {
   def activityIdFromUploadId(id: Long): UploadStatus = {
     try {
       val request = buildGetRequest(buildURI(s"uploads/$id"), authString, "")
-      request.getHeaders.set("Expect",Array("100-continue"))
+      //request.getHeaders.set("Expect",Array("100-continue"))
       request.getHeaders.setAccept("*/*")
 
       val response = request.execute()

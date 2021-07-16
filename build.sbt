@@ -5,7 +5,7 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 lazy val commonSettings = Seq(
   organization := "com.github.ondrejspanel",
   version := "0.4.2-beta",
-  scalaVersion := "2.12.10",
+  scalaVersion := "2.12.13", // Scala.js 0.6.33 does not exist for 2.12.14
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   libraryDependencies += "org.scala-lang.modules" %%% "scala-collection-compat" % "2.2.0"
 )
@@ -139,11 +139,15 @@ lazy val backend = (project in file("backend"))
     commonSettings,
 
     libraryDependencies ++= commonLibs ++ jvmLibs ++ Seq(
-      "com.google.http-client" % "google-http-client-appengine" % "1.31.0",
-      "com.google.http-client" % "google-http-client-jackson2" % "1.31.0",
-      "com.google.apis" % "google-api-services-storage" % "v1-rev158-1.25.0",
-      "com.google.appengine.tools" % "appengine-gcs-client" % "0.8" exclude("javax.servlet", "servlet.api"),
-      "com.google.cloud" % "google-cloud-storage" % "1.96.0",
+      "com.google.http-client" % "google-http-client-appengine" % "1.39.0",
+      "com.google.http-client" % "google-http-client-jackson2" % "1.39.0",
+      "com.google.apis" % "google-api-services-storage" % "v1-rev171-1.25.0",
+      //"com.google.apis" % "google-api-services-appengine" % "v1-rev20210618-1.32.1",
+      //"com.google.appengine" % "appengine-api-1.0-sdk" % "1.9.89",
+
+      "com.google.appengine.tools" % "appengine-gcs-client" % "0.8.1" exclude("javax.servlet", "servlet.api"),
+      "com.google.cloud" % "google-cloud-storage" % "1.118.0",
+      "com.google.cloud" % "google-cloud-tasks" % "1.33.2",
 
       "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,

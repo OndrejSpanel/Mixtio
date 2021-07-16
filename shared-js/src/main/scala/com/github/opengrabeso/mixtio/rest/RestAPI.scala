@@ -17,8 +17,13 @@ trait RestAPI {
   @Prefix("user")
   def userAPI(@Path userId: String, @Cookie authToken: String, @Cookie sessionId: String): UserRestAPI
 
+  // avoid using cookie parameters, we need to use this from tasks
+  def strava(userId: String, authToken: String, session: String): StravaRestAPI
+
   @GET
   def now: Future[ZonedDateTime]
+
+  def cleanup(pars: String): Future[Unit]
 }
 
 object RestAPI extends RestApiCompanion[EnhancedRestImplicits,RestAPI](EnhancedRestImplicits) {
