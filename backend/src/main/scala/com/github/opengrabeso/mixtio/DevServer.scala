@@ -1,17 +1,23 @@
 package com.github.opengrabeso.mixtio
 
 import java.io.{File, FileInputStream}
-
 import org.apache.commons.io.IOUtils
 import spark.{Request, Response, Route}
-import spark.Spark.{connect, delete, get, head, options, patch, post, put, trace}
+import spark.Spark.{connect, delete, get, head, options, patch, post, put, setPort, trace}
 
 object DevServer {
-  /** Note: server started this way has some limitations
-    * */
+  val portNumber = System.getenv.getOrDefault("PORT", "8080").toInt
+  val GAE_APPLICATION = System.getenv.get("GAE_APPLICATION")
+  val GAE_ENV = System.getenv.get("GAE_ENV")
+  val GAE_RUNTIME = System.getenv.get("GAE_RUNTIME")
+
+
   def main(args: Array[String]): Unit = {
     // start embedded Spark / Jetty server
     // defining routing will start init on its own
+
+    println(s"Starting Spark at port $portNumber, environment $GAE_ENV")
+    setPort(portNumber)
 
     object RestRoute extends Route("/rest/*") {
       object servlet extends rest.ServletRestAPIRest
