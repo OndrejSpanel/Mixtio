@@ -145,6 +145,9 @@ lazy val backend = (project in file("backend"))
       //"com.google.apis" % "google-api-services-appengine" % "v1-rev20210618-1.32.1",
       //"com.google.appengine" % "appengine-api-1.0-sdk" % "1.9.89",
 
+      // "javax.servlet" % "javax.servlet-api" % "4.0.1", // version 3.1.0 provided by the jetty-server should be fine
+      "org.eclipse.jetty" % "jetty-server" % "9.3.18.v20170406",
+
       "com.google.appengine.tools" % "appengine-gcs-client" % "0.8.1" exclude("javax.servlet", "servlet.api"),
       "com.google.cloud" % "google-cloud-storage" % "1.118.0",
       "com.google.cloud" % "google-cloud-tasks" % "1.33.2",
@@ -164,13 +167,6 @@ lazy val backend = (project in file("backend"))
       "commons-io" % "commons-io" % "2.1"
     )
   )
-
-lazy val jetty = (project in file("jetty")).dependsOn(backend).settings(
-  libraryDependencies ++= Seq(
-    // "javax.servlet" % "javax.servlet-api" % "4.0.1", // version 3.1.0 provided by the jetty-server should be fine
-    "org.eclipse.jetty" % "jetty-server" % "9.3.18.v20170406"
-  )
-)
 
 lazy val root = (project in file(".")).aggregate(backend).settings(
   name := "Mixtio"
