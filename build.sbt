@@ -129,10 +129,18 @@ lazy val backend = (project in file("backend"))
     addJSDependenciesToServerResources(),
 
     Compile / resourceGenerators += Def.task {
-      val file = (Compile / resourceManaged).value / "config.properties"
-      val contents = s"devMode=${inDevMode}"
-      IO.write(file, contents)
-      Seq(file)
+      import Path._
+      val configFile = (Compile / resourceManaged).value / "config.properties"
+      IO.write(configFile, s"devMode=$inDevMode\ndummy=false")
+
+      // from https://stackoverflow.com/a/57994298/16673
+      val staticDir = baseDirectory.value / "web" / "static"
+      val staticFiles = (staticDir ** "*.*").get()
+      val pairs = staticFiles pair rebase(staticDir, (Compile / resourceManaged).value / "static")
+
+      IO.copy(pairs)
+
+      configFile +: pairs.map(_._2)
     }.taskValue,
 
     commonSettings,

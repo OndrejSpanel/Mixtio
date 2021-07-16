@@ -40,8 +40,8 @@ object DevServer {
     object StaticRoute extends Route("/static/*") {
       def handle(request: Request, response: Response) = {
         val filename = request.splat().head
-        val path = "backend/web/static/" + filename
-        val stream = new FileInputStream(new File(path))
+        val path = "/static/" + filename
+        val stream = getClass.getResourceAsStream(path)
         try {
           val out = response.raw.getOutputStream
           IOUtils.copy(stream, out)
