@@ -33,6 +33,7 @@ object ServletRouting {
         case Method.Post => post(r)
         case Method.Delete => delete(r)
       }
+      println(s"Defined route ${h.handleUri}")
     }
 
     handlers.foreach(addPage)
