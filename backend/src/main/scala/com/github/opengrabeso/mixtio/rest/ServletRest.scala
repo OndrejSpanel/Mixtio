@@ -7,7 +7,7 @@ import com.avsystem.commons._
 import io.udash.rest.RestServlet
 import io.udash.rest.RestServlet.CookieHeader
 import io.udash.rest.raw.{HttpBody, HttpErrorException, HttpMethod, IMapping, Mapping, PlainValue, RawRest, RestParameters, RestRequest, RestResponse}
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import scala.annotation.tailrec
 import scala.util.{Failure, Success}

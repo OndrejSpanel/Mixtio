@@ -1,7 +1,4 @@
 cron:
-  - description: "Session cleanup"
-    url: /_ah/sessioncleanup?clear
-    schedule: every 6 hours
   - description: "Clean up obsolete data"
     url: /cleanup?periodic
     schedule: every 12 hours
