@@ -1,8 +1,7 @@
 package com.github.opengrabeso.mixtio
 
-import java.io.{File, FileInputStream}
 import org.apache.commons.io.IOUtils
-import spark.{Request, Response, Route}
+import spark.{AbstractRoute, HaltException, Request, Response, Route}
 import spark.Spark.{connect, delete, get, head, options, patch, post, put, setPort, trace}
 
 object DevServer {
@@ -39,15 +38,18 @@ object DevServer {
 
     object StaticRoute extends Route("/static/*") {
       def handle(request: Request, response: Response) = {
-        val filename = request.splat().head
-        val path = "/static/" + filename
-        val stream = getClass.getResourceAsStream(path)
-        try {
-          val out = response.raw.getOutputStream
-          IOUtils.copy(stream, out)
-          out.close()
-        } finally {
-          stream.close()
+        val filename = "/static/" + request.splat().mkString("/")
+        val stream = getClass.getResourceAsStream(filename)
+        if (stream != null) {
+          try {
+            val out = response.raw.getOutputStream
+            IOUtils.copy(stream, out)
+            out.close()
+          } finally {
+            stream.close()
+          }
+        } else {
+          AbstractRoute.halt(404, s"Static $filename not found")
         }
         response
       }
