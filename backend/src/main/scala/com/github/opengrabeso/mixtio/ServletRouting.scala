@@ -1,5 +1,6 @@
 package com.github.opengrabeso.mixtio
 
+import com.github.opengrabeso.mixtio.DevServer.DefRoute
 import spark.{Request, Response, Route}
 import spark.servlet.SparkApplication
 import spark.Spark._
@@ -8,7 +9,7 @@ object ServletRouting {
   import requests._
 
   def route(path: String)(handleFunc: (Request, Response) => AnyRef): Route = {
-    new Route(path) {
+    new DefRoute(path) {
       override def handle(request: Request, response: Response) = handleFunc(request, response)
     }
   }
@@ -26,12 +27,11 @@ object ServletRouting {
     // add any type derived from DefineRequest here
     // solution with reflection is elegant, but overcomplicated (and hard to get working with Google App Engine) and slow
     def addPage(h: DefineRequest) = {
-      val r = route(h.handleUri) (h.apply)
       h.method match {
-        case Method.Get => get(r)
-        case Method.Put => put(r)
-        case Method.Post => post(r)
-        case Method.Delete => delete(r)
+        case Method.Get => get(h.handleUri, h)
+        case Method.Put => put(h.handleUri, h)
+        case Method.Post => post(h.handleUri, h)
+        case Method.Delete => delete(h.handleUri, h)
       }
       println(s"Defined route ${h.handleUri}")
     }

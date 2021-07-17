@@ -112,32 +112,5 @@ trait WriteResponse {
   }
 }
 
-/**
-  * Class based on io.udash.rest.RestServlet
-  * GAE currently does not support async requests, therefore rewrite of that class was required.
-  * */
-class ServletRest(handleRequest: RawRest.HandleRequest) extends RestServlet(handleRequest) with ReadRequest with WriteResponse {
-  def maxPayloadSize = RestServlet.DefaultMaxPayloadSize
-  def BufferSize = 8192 // private in RestServlet, cannot use it from there
-
-  override def service(request: HttpServletRequest, response: HttpServletResponse): Unit = {
-    //val threadFactory = com.google.appengine.api.ThreadManager.currentRequestThreadFactory()
-    val r = handleRequest(readRequest(request))
-    // async - is it a problem? executed on com.avsystem.commons.concurrent.RunNowEC when the request was using
-    RawRest.safeAsync(r) {
-      case Success(restResponse) =>
-        if (restResponse.code >= 400) {
-          println(s"response ${restResponse.code}: ${restResponse.body.textualContentOpt}")
-        }
-        writeResponse(response, restResponse)
-      case Failure(e: HttpErrorException) =>
-        writeResponse(response, e.toResponse)
-      case Failure(e) =>
-        writeFailure(response, e.getMessage.opt)
-        logger.error("Failed to handle REST request", e)
-    }
-  }
-}
-
-class ServletRestAPIRest extends ServletRest(RawRest.asHandleRequest[RestAPI](RestAPIServer))
+class ServletRestAPIRest extends RestServlet(RawRest.asHandleRequest[RestRootAPI](RestRootAPIServer))
 

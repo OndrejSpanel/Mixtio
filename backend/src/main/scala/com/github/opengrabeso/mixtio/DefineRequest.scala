@@ -2,7 +2,7 @@ package com.github.opengrabeso.mixtio
 
 import java.net.{URLDecoder, URLEncoder}
 import Main._
-import spark.{Request, Response}
+import spark.{Request, Response, Route}
 
 import scala.util.Try
 import scala.xml.NodeSeq
@@ -22,11 +22,11 @@ object DefineRequest {
   abstract class Post(handleUri: String) extends DefineRequest(handleUri, method = Method.Post)
 }
 
-abstract class DefineRequest(val handleUri: String, val method: Method = Method.Get) {
+abstract class DefineRequest(val handleUri: String, val method: Method = Method.Get) extends Route {
 
   // some actions (logout) may have their URL prefixed to provide a specific functionality
 
-  def apply(request: Request, resp: Response): AnyRef = {
+  def handle(request: Request, resp: Response): AnyRef = {
 
     import com.google.appengine.api.utils.SystemProperty
 

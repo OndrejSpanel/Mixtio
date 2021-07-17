@@ -1,8 +1,9 @@
 package com.github.opengrabeso.mixtio
 
 import org.apache.commons.io.IOUtils
-import spark.{AbstractRoute, HaltException, Request, Response, Route}
-import spark.Spark.{connect, delete, get, head, options, patch, post, put, setPort, trace}
+import spark.{Request, Response, Route}
+import spark.Spark.{connect, delete, get, halt, head, options, patch, port, post, put, trace}
+import spark.embeddedserver.jetty.HttpRequestWrapper
 
 object DevServer {
   val portNumber = System.getenv.getOrDefault("PORT", "8080").toInt
@@ -10,33 +11,24 @@ object DevServer {
   val GAE_ENV = System.getenv.get("GAE_ENV")
   val GAE_RUNTIME = System.getenv.get("GAE_RUNTIME")
 
+  abstract class DefRoute(val path: String) extends Route
 
   def main(args: Array[String]): Unit = {
     // start embedded Spark / Jetty server
     // defining routing will start init on its own
 
     println(s"Starting Spark at port $portNumber, environment $GAE_ENV")
-    setPort(portNumber)
+    port(portNumber)
 
-    object RestRoute extends Route("/rest/*") {
+    object RestRoute extends DefRoute("/rest/*") {
       object servlet extends rest.ServletRestAPIRest
       def handle(request: Request, response: Response) = {
-        // maybe there is some more portable way, currently we do servlet path change only for Jetty requests
-        // when running embedded, we are sure to be running Jetty, therefore this should work fine
-        request.raw match {
-          case req: org.eclipse.jetty.server.Request =>
-            val pathInfo = req.getPathInfo
-            if (pathInfo.startsWith("/rest")) {
-              req.setServletPath("/rest")
-            }
-          case _ =>
-        }
         servlet.service(request.raw, response.raw)
         response
       }
     }
 
-    object StaticRoute extends Route("/static/*") {
+    object StaticRoute extends DefRoute("/static/*") {
       def handle(request: Request, response: Response) = {
         val filename = "/static/" + request.splat().mkString("/")
         val stream = getClass.getResourceAsStream(filename)
@@ -49,23 +41,23 @@ object DevServer {
             stream.close()
           }
         } else {
-          AbstractRoute.halt(404, s"Static $filename not found")
+          halt(404, s"Static $filename not found")
         }
         response
       }
     }
 
-    get(RestRoute)
-    post(RestRoute)
-    put(RestRoute)
-    delete(RestRoute)
-    patch(RestRoute)
-    head(RestRoute)
-    connect(RestRoute)
-    options(RestRoute)
-    trace(RestRoute)
+    get(RestRoute.path, RestRoute)
+    post(RestRoute.path, RestRoute)
+    put(RestRoute.path, RestRoute)
+    delete(RestRoute.path, RestRoute)
+    patch(RestRoute.path, RestRoute)
+    head(RestRoute.path, RestRoute)
+    connect(RestRoute.path, RestRoute)
+    options(RestRoute.path, RestRoute)
+    trace(RestRoute.path, RestRoute)
 
-    get(StaticRoute)
+    get(StaticRoute.path, StaticRoute)
 
     ServletRouting.init()
   }
