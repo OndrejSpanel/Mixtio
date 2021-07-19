@@ -10,9 +10,9 @@ import com.google.appengine.api.ThreadManager
 import com.google.appengine.api.utils.SystemProperty
 import com.google.cloud.tasks.v2._
 import com.google.protobuf.{ByteString, Timestamp}
-import collection.JavaConverters._
 
-import java.nio.charset.Charset
+import collection.JavaConverters._
+import java.nio.charset.StandardCharsets
 
 object BackgroundTasks {
   trait TaskDescription[Parameters] {
@@ -98,7 +98,7 @@ object BackgroundTasks {
       val taskBuilder = Task.newBuilder()
           .setAppEngineHttpRequest(
             AppEngineHttpRequest.newBuilder()
-              .setBody(ByteString.copyFrom(body, Charset.defaultCharset()))
+              .setBody(ByteString.copyFrom(body, StandardCharsets.UTF_8))
               .putAllHeaders(Map("Content-Type" -> "application/json").asJava)
               .setRelativeUri(task.path)
               .setHttpMethod(HttpMethod.POST)

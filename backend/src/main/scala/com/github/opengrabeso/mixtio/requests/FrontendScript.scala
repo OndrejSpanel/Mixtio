@@ -2,12 +2,11 @@ package com.github.opengrabeso.mixtio
 package requests
 
 import org.apache.commons.io.IOUtils
-import spark.{Request, Response}
 
-object FrontendScript extends DefineRequest("frontend/*") {
+object FrontendScript extends DefineRequest("/frontend/*") {
 
   def html(request: Request, resp: Response) = {
-    val scriptName = request.splat().head
+    val scriptName = uriRest(request)
     val moduleName = "frontend"
     val jsPath = scriptName match {
       case "script" =>
@@ -25,7 +24,7 @@ object FrontendScript extends DefineRequest("frontend/*") {
       resp.status(200)
       resp.`type`(mime)
 
-      val out = resp.raw.getOutputStream
+      val out = resp.getOutputStream
       IOUtils.copy(res, out)
       IOUtils.write("\n", out) // prevent empty file by always adding an empty line, empty file not handled well by Spark framework
     }

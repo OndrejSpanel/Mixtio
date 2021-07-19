@@ -77,8 +77,10 @@ class DumpFit extends FlatSpec with Matchers {
     }
   }
 
-  def decodeFile(in: InputStream, ignoreMessages: String*): Unit = {
-    decodeFileToOutput(println, in, ignoreMessages:_*)
+  def decodeFile(in: InputStream, ignoreMessages: String*): String = {
+    val builder = new StringBuilder
+    decodeFileToOutput(builder ++= _, in, ignoreMessages:_*)
+    builder.toString
   }
 
   def decodeFileToFile(outName: String, in: InputStream, ignoreMessages: String*): Unit = {

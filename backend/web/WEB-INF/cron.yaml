@@ -1,0 +1,4 @@
+cron:
+  - description: "Clean up obsolete data"
+    url: /cleanup?periodic
+    schedule: every 12 hours

@@ -2,15 +2,10 @@ package com.github.opengrabeso.mixtio
 package requests
 
 import java.io.{ByteArrayInputStream, InputStream, ObjectInputStream}
-import java.time.ZoneId
 
 import Main.NoActivity
 import shared.Timing
-import org.apache.commons.fileupload.FileItemStream
-import org.apache.commons.fileupload.disk.DiskFileItemFactory
-import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.io.IOUtils
-import spark.{Request, Response}
 
 import scala.util.Try
 
