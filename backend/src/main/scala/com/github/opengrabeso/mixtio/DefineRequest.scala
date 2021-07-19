@@ -2,10 +2,13 @@ package com.github.opengrabeso.mixtio
 
 import java.net.{URLDecoder, URLEncoder}
 import Main._
-import spark.{Request, Response, Route}
 
+import javax.servlet.{ServletRequest, ServletResponse}
 import scala.util.Try
 import scala.xml.NodeSeq
+import ServletUtils._
+
+import java.nio.charset.StandardCharsets
 
 sealed trait Method
 object Method {
@@ -22,30 +25,42 @@ object DefineRequest {
   abstract class Post(handleUri: String) extends DefineRequest(handleUri, method = Method.Post)
 }
 
-abstract class DefineRequest(val handleUri: String, val method: Method = Method.Get) extends Route {
+abstract class DefineRequest(val handleUri: String, val method: Method = Method.Get) extends ServletUtils {
+  type Request = ServletRequest
+  type Response = ServletResponse
+
+  def uriRest(request: ServletRequest): String = {
+    val uri = request.url
+    if (handleUri.endsWith("*")) {
+      val prefix = handleUri.dropRight(1)
+      assert(uri.startsWith(prefix))
+      uri.drop(prefix.length)
+    } else {
+      throw new UnsupportedOperationException(s"Cannot get URI rest by pattern $handleUri")
+    }
+
+  }
 
   // some actions (logout) may have their URL prefixed to provide a specific functionality
 
-  def handle(request: Request, resp: Response): AnyRef = {
+  def handle(request: Request, resp: Response): Unit = {
 
-    import com.google.appengine.api.utils.SystemProperty
-
-    if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
-      // logging on production server is counter-productive, logs are already sorted by request
-      println(s"Request ${request.url()}")
-    }
     val nodes = html(request, resp)
     if (nodes.nonEmpty) {
       nodes.head match {
         case <html>{_*}</html> =>
           val docType = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd" >"""
-          docType + nodes.toString
+          val body = docType + nodes.toString
+          resp.`type`("text/html")
+          resp.getOutputStream.write(body.getBytes(StandardCharsets.UTF_8))
         case _ =>
-          resp.`type`("text/xml; charset=utf-8")
+          resp.setContentType("text/xml; charset=utf-8")
           val xmlPrefix = """<?xml version="1.0" encoding="UTF-8"?>""" + "\n"
-          xmlPrefix + nodes.toString
+          val body = xmlPrefix + nodes.toString
+          resp.getOutputStream.write(body.getBytes(StandardCharsets.UTF_8))
+          resp.`type`("text/xml")
       }
-    } else resp
+    }
   }
 
   def html(request: Request, resp: Response): NodeSeq
@@ -105,7 +120,7 @@ abstract class DefineRequest(val handleUri: String, val method: Method = Method.
     </div>
   }
 
-  def storeAuthCookies(resp: Response, auth: StravaAuthResult) = {
+  def storeAuthCookies(resp: ServletResponse, auth: StravaAuthResult) = {
     println(s"Store auth cookies session ${auth.sessionId}")
     val loginAge = 3600 * 24 * 30 // 30 days
     resp.cookie("authToken", auth.token, loginAge)
@@ -116,7 +131,7 @@ abstract class DefineRequest(val handleUri: String, val method: Method = Method.
     resp.cookie("sessionId", auth.sessionId) // session cookie - no expiry
   }
 
-  def performAuth(code: String, resp: Response): Try[StravaAuthResult] = {
+  def performAuth(code: String, resp: ServletResponse): Try[StravaAuthResult] = {
     val authResult = Try(Main.stravaAuth(code))
     authResult.foreach { auth =>
       println("Login done, create authCode cookie")
@@ -128,7 +143,7 @@ abstract class DefineRequest(val handleUri: String, val method: Method = Method.
     authResult
   }
 
-  def loadAuthFromCookies(r: Request): Option[StravaAuthResult] = {
+  def loadAuthFromCookies(r: ServletRequest): Option[StravaAuthResult] = {
     val token = r.cookie("authToken")
     val refresh = r.cookie("authRefreshToken")
     val refreshExpire = r.cookie("authRefreshExpire")
@@ -148,7 +163,7 @@ abstract class DefineRequest(val handleUri: String, val method: Method = Method.
     }
   }
 
-  def withAuth(req: Request, resp: Response)(body: StravaAuthResult => NodeSeq): NodeSeq = {
+  def withAuth(req: ServletRequest, resp: ServletResponse)(body: StravaAuthResult => NodeSeq): NodeSeq = {
     val codePar = Option(req.queryParams("code"))
     val statePar = Option(req.queryParams("state")).filter(_.nonEmpty)
     codePar.fold {
@@ -163,7 +178,7 @@ abstract class DefineRequest(val handleUri: String, val method: Method = Method.
     } { code =>
       if (performAuth(code, resp).isSuccess) {
         println("withAuth performAuth redirect")
-        resp.redirect(req.url() + statePar.fold("")("?" + _))
+        resp.redirect(req.url + statePar.fold("")("?" + _))
         NodeSeq.Empty
       } else {
         println("withAuth performAuth loginPage")

@@ -149,11 +149,9 @@ lazy val backend = (project in file("backend"))
       "com.google.http-client" % "google-http-client-appengine" % "1.39.0",
       "com.google.http-client" % "google-http-client-jackson2" % "1.39.0",
       "com.google.apis" % "google-api-services-storage" % "v1-rev171-1.25.0",
-      //"com.google.apis" % "google-api-services-appengine" % "v1-rev20210618-1.32.1",
-      //"com.google.appengine" % "appengine-api-1.0-sdk" % "1.9.89",
 
-      // "javax.servlet" % "javax.servlet-api" % "4.0.1", // version 3.1.0 provided by the jetty-server should be fine
       "org.eclipse.jetty" % "jetty-server" % "9.4.31.v20200723",
+      "org.eclipse.jetty" % "jetty-servlet" % "9.4.31.v20200723",
 
       "com.google.appengine.tools" % "appengine-gcs-client" % "0.8.1" exclude("javax.servlet", "servlet.api"),
       "com.google.cloud" % "google-cloud-storage" % "1.118.0",
@@ -164,7 +162,6 @@ lazy val backend = (project in file("backend"))
 
       "fr.opensagres.xdocreport.appengine-awt" % "appengine-awt" % "1.0.0",
 
-      "com.sparkjava" % "spark-core" % "2.9.3" excludeAll ExclusionRule(organization = "org.eclipse.jetty"),
       "org.slf4j" % "slf4j-simple" % "1.6.1",
       "commons-fileupload" % "commons-fileupload" % "1.3.2",
       "com.jsuereth" %% "scala-arm" % "2.0" exclude(

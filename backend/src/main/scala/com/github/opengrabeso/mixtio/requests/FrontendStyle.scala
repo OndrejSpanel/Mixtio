@@ -2,7 +2,6 @@ package com.github.opengrabeso.mixtio
 package requests
 
 import com.github.opengrabeso.mixtio.shared.Timing
-import spark.{Request, Response}
 import common.css._
 import io.udash.css.CssStringRenderer
 import scalacss.internal.{Renderer, StringRenderer}
@@ -13,7 +12,7 @@ Doing CSS rendering runtime is much simpler. As long as CSS is not very complica
 For compile time (SBT based) rendering see commit 682a1f6c72c2135c0e0bf0dbb383ccf7e06f8427
 */
 
-object FrontendStyle extends DefineRequest("frontend/main.css") {
+object FrontendStyle extends DefineRequest("/frontend/main.css") {
   private val styles = Seq(
     GlobalStyles,
     SelectPageStyles,
@@ -32,7 +31,7 @@ object FrontendStyle extends DefineRequest("frontend/main.css") {
     resp.status(200)
     resp.`type`("text/css")
 
-    val out = resp.raw.getOutputStream
+    val out = resp.getOutputStream
     IOUtils.write(cssString, out)
     IOUtils.write("\n", out) // prevent empty file by always adding an empty line, empty file not handled well by Spark framework
 
