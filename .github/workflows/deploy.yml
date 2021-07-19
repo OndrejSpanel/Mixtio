@@ -21,7 +21,7 @@ jobs:
       - name: Prepare environment secrets
         run: |
           printf "${{ secrets.SECRET_TXT }}" > backend/src/main/resources/secret.txt
-          printf "${{ secrets.GCP_SA_KEY }}" > backend/src/main/resources/mixtio-191009221320.json
+          printf "${{ secrets.GCP_SA_KEY }}" > backend/src/main/resources/sa.json
 
       - name: Assembly
         run: sbt backend/assembly
