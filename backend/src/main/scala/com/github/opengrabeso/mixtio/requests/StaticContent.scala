@@ -5,7 +5,7 @@ import org.apache.commons.io.IOUtils
 
 object StaticContent extends DefineRequest("/static/*") {
   def html(request: Request, response: Response) = {
-    val filename = request.url
+    val filename = request.relativeUrl
     val stream = getClass.getResourceAsStream(filename)
     if (stream != null) {
       try {

@@ -8,7 +8,8 @@ trait ServletUtils {
     def http: HttpServletRequest = req.asInstanceOf[HttpServletRequest]
     def queryString: String = http.getQueryString
     def queryParams(name: String): String = req.getParameter(name)
-    def url: String = http.getRequestURI
+    def url: String = http.getRequestURL.toString
+    def relativeUrl: String = http.getRequestURI
     def cookie(name: String): String = {
       val cookieWithName = for {
         cookies <- Option(http.getCookies).toSeq

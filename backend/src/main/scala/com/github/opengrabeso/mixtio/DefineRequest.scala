@@ -30,7 +30,7 @@ abstract class DefineRequest(val handleUri: String, val method: Method = Method.
   type Response = ServletResponse
 
   def uriRest(request: ServletRequest): String = {
-    val uri = request.url
+    val uri = request.relativeUrl
     if (handleUri.endsWith("*")) {
       val prefix = handleUri.dropRight(1)
       assert(uri.startsWith(prefix))
