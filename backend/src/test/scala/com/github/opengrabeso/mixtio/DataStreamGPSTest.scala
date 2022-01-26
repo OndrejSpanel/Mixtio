@@ -1,9 +1,10 @@
 package com.github.opengrabeso.mixtio
 
 import java.time.ZonedDateTime
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class DataStreamGPSTest extends FlatSpec with Matchers with SuuntoData {
+class DataStreamGPSTest extends AnyFlatSpec with Matchers with SuuntoData {
   behavior of "DataStreamGPS"
 
 

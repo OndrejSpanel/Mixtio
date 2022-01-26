@@ -5,9 +5,10 @@ import java.io.{FileOutputStream, InputStream, PrintStream}
 import com.garmin.fit._
 
 import scala.collection.JavaConverters._
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class DumpFit extends FlatSpec with Matchers {
+class DumpFit extends AnyFlatSpec with Matchers {
 
   behavior of "Decoder"
 

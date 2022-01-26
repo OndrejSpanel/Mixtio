@@ -2,9 +2,10 @@ package com.github.opengrabeso.mixtio
 
 import java.time.ZonedDateTime
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class SuuntoMergeTest extends FlatSpec with Matchers with SuuntoData {
+class SuuntoMergeTest extends AnyFlatSpec with Matchers with SuuntoData {
   behavior of "SuuntoMerge"
 
   it should "load Quest file" in {

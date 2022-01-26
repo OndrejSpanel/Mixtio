@@ -2,7 +2,6 @@ package com.github.opengrabeso.mixtio
 package requests
 
 import java.time.ZonedDateTime
-import com.google.appengine.api.taskqueue.DeferredTask
 import Main._
 import common.Util._
 import common.model._
@@ -11,8 +10,9 @@ import common.model._
   * User specific cleanup, requires user access tokens for Strava */
 
 @SerialVersionUID(10L)
-case class UserCleanup(auth: StravaAuthResult, before: ZonedDateTime) extends DeferredTask {
-  override def run(): Unit = {
+case class UserCleanup(auth: StravaAuthResult, before: ZonedDateTime) {
+  // TODO: implement properly (using cron?)
+  def run(): Unit = {
 
     val d = Storage.enumerate(namespace.stage, auth.userId)
 

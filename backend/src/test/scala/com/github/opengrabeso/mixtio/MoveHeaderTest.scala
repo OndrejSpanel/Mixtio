@@ -1,11 +1,12 @@
 package com.github.opengrabeso.mixtio
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by Ondra on 23.3.2016.
   */
-class MoveHeaderTest extends FlatSpec with Matchers {
+class MoveHeaderTest extends AnyFlatSpec with Matchers {
   import MoveHeader._
 
   behavior of "MoveHeaderTest"

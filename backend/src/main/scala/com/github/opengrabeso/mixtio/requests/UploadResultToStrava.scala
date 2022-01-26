@@ -1,8 +1,6 @@
 package com.github.opengrabeso.mixtio
 package requests
 
-import com.google.appengine.api.taskqueue._
-
 import scala.xml.NodeSeq
 
 sealed trait UploadStatus {
