@@ -6,8 +6,7 @@ lazy val commonSettings = Seq(
   organization := "com.github.ondrejspanel",
   version := "0.5.0",
   scalaVersion := "2.13.10",
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
-  libraryDependencies += "org.scala-lang.modules" %%% "scala-collection-compat" % "2.2.0"
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 )
 
 lazy val jsCommonSettings = Seq(
