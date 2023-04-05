@@ -6,9 +6,9 @@ import common.model._
 import frontend.model._
 import io.udash.component.ComponentId
 import org.scalajs.dom
-import scalatags.JsDom.all.{raw, select => tag_select, _}
+import scalatags.JsDom.all.{select => tag_select, _}
 import io.udash._
-import org.scalajs.dom.raw.HTMLOptionElement
+import org.scalajs.dom.HTMLOptionElement
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -58,11 +58,11 @@ object EventView {
 
   }
 
-  def selectId(time: Int): ComponentId = ComponentId("actionSelect").subcomponent(time.toString)
+  def selectId(time: Int): ComponentId = ComponentId("actionSelect").withSuffix(time.toString)
 
   def getSelectHtml(editEvent: EditEvent, title: String): dom.Element = {
     // replicate the option used in the table
-    val tableOption = dom.document.getElementById(selectId(editEvent.time).id)
+    val tableOption = dom.document.getElementById(selectId(editEvent.time).toString)
     val html = tableOption.innerHTML
 
     span(
@@ -82,7 +82,7 @@ object EventView {
 
   @JSExportTopLevel("onChangeEvent")
   def onChangeEvent(value: String, time: Int): Unit = {
-    val option = dom.document.getElementById(selectId(time).id).asInstanceOf[HTMLOptionElement]
+    val option = dom.document.getElementById(selectId(time).toString).asInstanceOf[HTMLOptionElement]
     option.value = value
   }
 }

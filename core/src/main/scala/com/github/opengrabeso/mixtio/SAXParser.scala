@@ -89,7 +89,7 @@ object SAXParser {
   }
   class XMLTag(val name: String, val inner: XMLTag*)(val attributes: XMLAttribute*) extends TagHandler {
 
-    val tagMap: Map[String, XMLTag] = inner.map(tag => tag.name -> tag)(collection.breakOut)
+    val tagMap: Map[String, XMLTag] = inner.map(tag => tag.name -> tag).toMap
 
     def findInner(tag: String): Option[XMLTag] = tagMap.get(tag)
 

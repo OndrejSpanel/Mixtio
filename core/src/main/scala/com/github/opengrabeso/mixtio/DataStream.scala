@@ -261,7 +261,7 @@ object DataStreamGPS {
     val route = distDeltas.scanLeft(0d) { case (sum, (_, d)) => sum + d }
     // scanLeft adds initial value as a first element - use tail to drop it
     val ret = distDeltas.map(_._1) zip route.tail
-    SortedMap(ret:_*)
+    SortedMap.from(ret)
   }
 
   def distStreamFromRouteStream(dist: Seq[(ZonedDateTime, Double)]): DistStream = {
@@ -269,7 +269,7 @@ object DataStreamGPS {
     val routeValues = dist.map(_._2)
     val distValues = 0.0 +: (routeValues zip routeValues.drop(1)).map(p => p._2 - p._1)
     val ret = times zip distValues
-    SortedMap(ret:_*)
+    SortedMap.from(ret)
   }
 
   def routeStreamFromSpeedStream(distDeltas: DistStream): DistStream = {
@@ -280,7 +280,7 @@ object DataStreamGPS {
         val dt = ChronoUnit.SECONDS.between(tSum, t)
         t -> (dSum + d * dt)
       }
-      route
+      SortedMap.from(route)
     }
   }
 

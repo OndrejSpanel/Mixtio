@@ -10,7 +10,7 @@ import com.google.api.client.http.json.JsonHttpContent
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.api.client.json.gson.GsonFactory
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import common.Util._
 import common.model._
 import shared.Timing
@@ -36,7 +36,7 @@ object Main extends common.Formatting {
     val filename = "/secret.txt"
     try {
       val secretStream = Main.getClass.getResourceAsStream(filename)
-      val lines = scala.io.Source.fromInputStream(secretStream).getLines
+      val lines = scala.io.Source.fromInputStream(secretStream).getLines()
       SecretResult(lines.next(), lines.next(), lines.next(), lines.next(), "")
     } catch {
       case _: NullPointerException => // no file found
@@ -263,15 +263,15 @@ object Main extends common.Formatting {
 
       private val responseJson = jsonMapper.readTree(response)
 
-      val streams = responseJson.elements.asScala.toIterable
+      val streams = responseJson.elements.asScala.iterator.to(Iterable)
 
-      def getData[T](stream: Stream[JsonNode], get: JsonNode => T): Vector[T] = {
+      def getData[T](stream: LazyList[JsonNode], get: JsonNode => T): Vector[T] = {
         if (stream.isEmpty) Vector()
         else stream.head.path("data").asScala.map(get).toVector
       }
 
       def getDataByName[T](name: String, get: JsonNode => T): Vector[T] = {
-        val stream = streams.filter(_.path("type").textValue == name).toStream
+        val stream = streams.filter(_.path("type").textValue == name).to(LazyList)
         getData(stream, get)
       }
 

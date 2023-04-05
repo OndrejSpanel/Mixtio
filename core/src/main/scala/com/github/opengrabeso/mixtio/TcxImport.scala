@@ -120,11 +120,11 @@ object TcxImport {
       time -> v
     }
 
-    val gpsStream = new DataStreamGPS(SortedMap(gpsSamples: _*))
-    val hrStream = if (hrSamples.exists(_._2 != 0)) Some(new DataStreamHR(SortedMap(hrSamples: _*))) else None
+    val gpsStream = new DataStreamGPS(SortedMap.from(gpsSamples))
+    val hrStream = if (hrSamples.exists(_._2 != 0)) Some(new DataStreamHR(SortedMap.from(hrSamples))) else None
 
     val distData = if (distSamples.nonEmpty) {
-      new DataStreamDist(SortedMap(distSamples:_*))
+      new DataStreamDist(SortedMap.from(distSamples))
     } else {
       new DataStreamDist(DataStreamGPS.routeStreamFromGPS(gpsStream.stream))
     }

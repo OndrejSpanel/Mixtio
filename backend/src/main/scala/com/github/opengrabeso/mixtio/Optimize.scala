@@ -259,8 +259,8 @@ object Optimize {
           // found gps data for given distance
           def gpsWithDistance(d: Double): GPSPoint = {
             val get = for {
-              prev <- gpsByDistance.to(d).lastOption
-              next <- gpsByDistance.from(d).headOption
+              prev <- gpsByDistance.rangeTo(d).lastOption
+              next <- gpsByDistance.rangeFrom(d).headOption
             } yield {
               def vecFromGPS(g: GPSPoint) = Vector2(g.latitude, g.longitude)
 

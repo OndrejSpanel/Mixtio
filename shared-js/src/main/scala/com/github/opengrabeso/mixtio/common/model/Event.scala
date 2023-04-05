@@ -49,10 +49,10 @@ sealed abstract class Event {
   def originalEvent: String = defaultEvent
 
   protected def listSplitTypes: Seq[EventKind] = {
-    Sport.values.map { s =>
+    Sport.values.toSeq.map { s =>
       val sport = s.toString
       EventKind(s"split$sport", s"- $sport")
-    }(collection.breakOut)
+    }
   }
 
   def listTypes: Array[EventKind] = (Seq(

@@ -5,12 +5,12 @@ package views
 import routing._
 import io.udash._
 import io.udash.bootstrap._
-import io.udash.bootstrap.button.UdashButton
+import io.udash.bootstrap.button.{UdashButton, UdashButtonOptions}
 import io.udash.component.ComponentId
 import io.udash.css._
 import common.css._
 import org.scalajs.dom
-import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.dom.HTMLElement
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -59,7 +59,7 @@ object Root {
             for (c <- authCookies) {
               MainJS.deleteCookie(c)
             }
-            application.redirectTo("/app")
+            application.redirectTo(Url("/app"))
           case Failure(_) =>
         }
       }
@@ -77,7 +77,8 @@ object Root {
 
     private val logoutButton = UdashButton(
       //buttonStyle = ButtonStyle.Default,
-      block = true.toProperty, componentId = ComponentId("logout-button")
+      options = UdashButtonOptions(block = true)
+      , componentId = ComponentId("logout-button")
     )("Log Out")
 
     logoutButton.listen {

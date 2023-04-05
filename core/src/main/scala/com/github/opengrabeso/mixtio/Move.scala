@@ -36,7 +36,7 @@ case class Move(fileName: Set[String], header: MoveHeader, streams: Map[Class[_]
   }
 
   def timeOffset(bestOffset: Int): Move = {
-    copy(streams = streams.mapValues(_.timeOffset(bestOffset)))
+    copy(streams = streams.view.mapValues(_.timeOffset(bestOffset)).toMap)
   }
 
   def stream[T <: DataStream: ClassTag]: T = streams(classTag[T].runtimeClass).asInstanceOf[T]
@@ -65,7 +65,7 @@ case class Move(fileName: Set[String], header: MoveHeader, streams: Map[Class[_]
   def startsAfter(after: Option[ZonedDateTime]): Boolean = {
     after.isEmpty || startTime.exists(_ >= after.get)
   }
-  
+
   def toLog: String = streams.values.map(_.toLog).mkString(", ")
 
   def addStream(streamSource: Move, stream: DataStream): Move = {
@@ -73,10 +73,10 @@ case class Move(fileName: Set[String], header: MoveHeader, streams: Map[Class[_]
   }
 
   def span(time: ZonedDateTime): (Option[Move], Option[Move]) = {
-    val split = streams.mapValues(_.span(time))
+    val split = streams.view.mapValues(_.span(time)).toMap
 
-    val take = split.mapValues(_._1)
-    val left = split.mapValues(_._2)
+    val take = split.view.mapValues(_._1).toMap
+    val left = split.view.mapValues(_._2).toMap
 
     val takeMove = copy(streams = take)
     val leftMove = copy(streams = left)

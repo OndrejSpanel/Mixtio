@@ -33,7 +33,7 @@ object GetElevation {
     def tileImage(x: Long, y: Long, z: Long)(implicit threadFactory: ThreadFactory): Future[BufferedImage] = {
 
       tiles.getOrElseUpdate((x, y, z), {
-        val promise = Promise[BufferedImage]
+        val promise = Promise[BufferedImage]()
 
         val runnable = new Runnable {
           def run() = {

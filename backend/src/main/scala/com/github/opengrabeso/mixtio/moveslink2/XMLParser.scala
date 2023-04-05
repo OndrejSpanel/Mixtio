@@ -155,10 +155,10 @@ object XMLParser {
       }
 
 
-      val gpsStream = new DataStreamGPS(SortedMap(gpsSamples.filter(s => inRange(s._1)): _*))
-      val distStream = new DataStreamDist(SortedMap(distSamples: _*))
+      val gpsStream = new DataStreamGPS(SortedMap.from(gpsSamples.filter(s => inRange(s._1))))
+      val distStream = new DataStreamDist(SortedMap.from(distSamples))
 
-      val hrStream = if (hrSamples.exists(_._2 != 0)) Some(new DataStreamHR(SortedMap(hrSamples: _*))) else None
+      val hrStream = if (hrSamples.exists(_._2 != 0)) Some(new DataStreamHR(SortedMap.from(hrSamples))) else None
 
       val lapTimes = parsed.laps.map(_.timestamp).filter(inRange)
 

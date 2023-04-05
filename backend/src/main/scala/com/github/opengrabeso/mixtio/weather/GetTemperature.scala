@@ -65,7 +65,7 @@ object GetTemperature {
       }
     }
     val times = pickPositionsRecurse(None, data.stream.toList, Nil).toSet
-    val positions = data.stream.filterKeys(times.apply)
+    val positions = data.stream.view.filterKeys(times.apply).to(SortedMap)
     data.pickData(positions)
   }
 

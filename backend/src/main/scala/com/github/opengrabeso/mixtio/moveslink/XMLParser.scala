@@ -178,7 +178,7 @@ object XMLParser {
 
       val move = new Move(Set(fileName), header, hrStream, distStream)
       if (laps.nonEmpty) {
-        move.addStream(move, new DataStreamLap(SortedMap(laps.map(time => time -> "Manual"): _*)))
+        move.addStream(move, new DataStreamLap(SortedMap.from(laps.map(time => time -> "Manual"))))
       } else {
         move
       }
