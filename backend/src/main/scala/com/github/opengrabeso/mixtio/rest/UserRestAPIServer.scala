@@ -203,7 +203,7 @@ class UserRestAPIServer(val userAuth: Main.StravaAuthResult) extends UserRestAPI
         e -> merged.distanceForTime(e.stamp)
       }
 
-      Some((prepare.id.id, events))
+      Some((prepare.id.id, events.toIndexedSeq))
 
     } else {
       None

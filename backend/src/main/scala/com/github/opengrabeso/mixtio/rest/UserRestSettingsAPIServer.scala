@@ -17,10 +17,8 @@ class UserRestSettingsAPIServer(userId: String) extends UserRestSettingsAPI with
   def quest_time_offset = getSetting(_.questTimeOffset)
   def max_hr = getSetting(_.maxHR)
   def elev_filter = getSetting(_.elevFilter)
-  def dark_sky = getSetting(_.darkSky)
 
   def quest_time_offset(v: Int) = setSetting(_.setQuestTimeOffset(Some(v)))
   def max_hr(v: Int) = setSetting(_.setMaxHR(Some(v)))
   def elev_filter(v: Int) = setSetting(_.setElevFilter(Some(v)))
-  def dark_sky(v: Boolean) = setSetting(_.setDarkSky(Some(v)))
 }

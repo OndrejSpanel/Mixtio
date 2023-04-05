@@ -115,7 +115,7 @@ abstract class DefineRequest(val handleUri: String, val method: Method = Method.
       <a href="http://labs.strava.com/" id="powered_by_strava" rel="nofollow">
         <img align="left" src="static/api_logo_pwrdBy_strava_horiz_white.png" style="max-height:46px"/>
       </a>
-      <p style="color:#fff"><a href="https://darksky.net/poweredby/" style="color:#fff">Powered by Dark Sky</a> © 2016 - 2018 <a href={s"https://github.com/OndrejSpanel/${gitHubName}"} style="color:inherit">Ondřej Španěl</a></p>
+      <p style="color:#fff">© 2016 - 2018 <a href={s"https://github.com/OndrejSpanel/${gitHubName}"} style="color:inherit">Ondřej Španěl</a></p>
       <div/>
     </div>
   }

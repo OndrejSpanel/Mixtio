@@ -146,12 +146,6 @@ object Root {
         p(
           GlobalStyles.footerText,
           a(
-            GlobalStyles.footerLink,
-            href := "https://darksky.net/poweredby/",
-            "Powered by Dark Sky"
-          ),
-          " © 2016 - 2018 ",
-          a(
             href := s"https://github.com/OndrejSpanel/$gitHubName",
             GlobalStyles.footerLink,
           ),

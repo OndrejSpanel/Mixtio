@@ -15,9 +15,6 @@ trait UserRestSettingsAPI {
   @GET
   def elev_filter: Future[Int]
 
-  @GET
-  def dark_sky: Future[Boolean]
-
   @PUT
   def quest_time_offset(v: Int): Future[Unit]
 
@@ -26,9 +23,6 @@ trait UserRestSettingsAPI {
 
   @PUT
   def elev_filter(v: Int): Future[Unit]
-
-  @PUT
-  def dark_sky(v: Boolean): Future[Unit]
 }
 
 object UserRestSettingsAPI extends RestApiCompanion[EnhancedRestImplicits,UserRestSettingsAPI](EnhancedRestImplicits)

@@ -206,17 +206,7 @@ object Optimize {
         case attr =>
           attr
       }
-      if (attributes.exists(_.attribName == "temp") && (id.sportName == SportId.Swim || !settings.darkSky) ) {
-        copy(attributes = hrFiltered)
-      } else {
-        val temperaturePos = weather.GetTemperature.pickPositions(elevFiltered.gps)
-        if (temperaturePos.nonEmpty) {
-          val temperature = weather.GetTemperature.forPositions(temperaturePos)
-          copy(attributes = temperature +: hrFiltered)
-        } else {
-          copy(attributes = hrFiltered)
-        }
-      }
+      copy(attributes = hrFiltered)
     }
 
 
