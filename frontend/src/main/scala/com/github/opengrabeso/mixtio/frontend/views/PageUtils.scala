@@ -14,7 +14,7 @@ import scalatags.JsDom.all._
 
 trait PageUtils extends common.Formatting with CssView {
   implicit class ColorOptions(c: Color) {
-    def option: UdashButtonOptions = UdashButtonOptions(Color.Danger.opt)
+    def option: UdashButtonOptions = UdashButtonOptions(c.opt)
   }
 
   def buttonOnClick(button: UdashButton)(callback: => Unit): UdashButton = {
