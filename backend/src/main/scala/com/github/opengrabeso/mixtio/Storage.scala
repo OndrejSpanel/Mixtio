@@ -6,7 +6,7 @@ import java.nio.channels.Channels
 
 import com.google.auth.oauth2.GoogleCredentials
 
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import com.google.cloud.storage.{Option => GCSOption, _}
 import com.google.cloud.storage.Storage._
 import org.apache.commons.io.IOUtils

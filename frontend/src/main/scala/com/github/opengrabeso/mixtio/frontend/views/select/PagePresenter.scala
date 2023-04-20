@@ -108,7 +108,7 @@ class PagePresenter(
   }
 
   def uploadNewActivity() = {
-    val selectedFiles = model.subSeq(_.uploads.selectedFiles).get
+    val selectedFiles = model.subSeq(_.uploads.selectedFiles).get.toSeq
 
     val userId = userService.userId.get
 

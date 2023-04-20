@@ -61,7 +61,7 @@ object mapboxgl extends js.Any {
     def getContainer(): dom.Element = js.native
     def getSource(name: String): js.UndefOr[js.Dynamic] = js.native
     def getBounds(): LngLatBounds = js.native
-    def getCanvas(): dom.raw.HTMLCanvasElement = js.native
+    def getCanvas(): dom.HTMLCanvasElement = js.native
     def setPaintProperty(name1: String, name2: String, value: js.Any): Unit = js.native
     def setLayoutProperty(name1: String, name2: String, value: js.Any): Unit = js.native
     def fitBounds(bounds: LngLatBounds, options: js.Object = js.native, eventData: js.Object = js.native): Unit = js.native

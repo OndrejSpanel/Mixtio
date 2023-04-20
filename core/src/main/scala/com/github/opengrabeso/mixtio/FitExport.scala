@@ -29,13 +29,13 @@ object FitExport {
     dateTime
   }
 
-  def export(events: ActivityEvents): Array[Byte] = {
+  def `export`(events: ActivityEvents): Array[Byte] = {
     val encoder = createEncoder
 
     abstract class FitEvent {
       def time: ZonedDateTime
 
-      def encode(encoder: Encoder)
+      def encode(encoder: Encoder): Unit
     }
 
     abstract class DataEvent(time: ZonedDateTime, set: RecordMesg => Unit) extends FitEvent {
@@ -97,7 +97,7 @@ object FitExport {
     }
 
     trait AutoClose {
-      def emitMsg(time: ZonedDateTime, endTime: ZonedDateTime)
+      def emitMsg(time: ZonedDateTime, endTime: ZonedDateTime): Unit
 
       private var isOpen = false
       private var counter = 0

@@ -25,17 +25,12 @@ trait SettingsView extends TimeFormatting {
     div(
       UdashForm(inputValidationTrigger = UdashForm.ValidationTrigger.OnChange)(factory => Seq[Modifier](
         factory.input.formGroup()(
-          input = _ => factory.input.numberInput(model.subProp(_.settings.maxHR).transform(_.toString, _.toInt))().render,
+          input = _ => factory.input.numberInput(model.subProp(_.settings.maxHR).bitransform(_.toDouble)(_.toInt))().render,
           labelContent = Some(_ => "Max HR": Modifier),
           helpText = Some(_ => "Drop any samples with HR above this limit as erratic": Modifier)
         ),
         factory.input.formGroup()(
-          input = _ => factory.input.checkbox(model.subProp(_.settings.darkSky))().render,
-          labelContent = Some(_ => "Prefer Internet weather": Modifier),
-          helpText = Some(_ => "Prefer weather data from Internet for any non-swim activities": Modifier)
-        ),
-        factory.input.formGroup()(
-          input = _ => factory.input.numberInput(model.subProp(_.settings.questTimeOffset).transform(_.toString, _.toInt))().render,
+          input = _ => factory.input.numberInput(model.subProp(_.settings.questTimeOffset).bitransform(_.toDouble)(_.toInt))().render,
           labelContent = Some(_ => "Additional sensor (e.g. Quest) time offset: ": Modifier),
           helpText = Some(_ => "Adjust so that the time below matches the time on your watches/sensor": Modifier)
         ),

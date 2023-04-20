@@ -60,7 +60,7 @@ class UserRestAPIServer(val userAuth: Main.StravaAuthResult) extends UserRestAPI
       activityData.id
     } catch {
       case ex: HttpResponseException if ex.getStatusCode == 404 =>
-        throw HttpErrorException(400, "Activity data not found", ex.getCause)
+        throw HttpErrorException.plain(400, "Activity data not found", ex.getCause)
 
     }
   }
@@ -203,7 +203,7 @@ class UserRestAPIServer(val userAuth: Main.StravaAuthResult) extends UserRestAPI
         e -> merged.distanceForTime(e.stamp)
       }
 
-      Some((prepare.id.id, events))
+      Some((prepare.id.id, events.toIndexedSeq))
 
     } else {
       None

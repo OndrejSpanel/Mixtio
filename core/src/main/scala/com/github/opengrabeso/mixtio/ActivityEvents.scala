@@ -112,7 +112,7 @@ object ActivityEvents {
                 // with 20 samples we ignore 150 meters
 
                 val neverIgnoreElevCoef = 7.5
-                if (minElevDiff._2 > todo.length * neverIgnoreElevCoef) break
+                if (minElevDiff._2 > todo.length * neverIgnoreElevCoef) break()
 
                 val locate = todo.indexWhere(_.stamp == minElevDiff._1)
 
@@ -230,7 +230,7 @@ case class ActivityEvents(id: ActivityId, events: Array[Event], dist: DataStream
     (elevations zip elevations.drop(1)).map {case (prev, next) => (next - prev) max 0}.sum
   }
 
-  def eventTimes: DataStream.EventTimes = events.map(_.stamp)(collection.breakOut)
+  def eventTimes: DataStream.EventTimes = events.map(_.stamp).toList
 
   def merge(that: ActivityEvents): ActivityEvents = {
     // select some id (name, sport ...)
@@ -543,7 +543,7 @@ case class ActivityEvents(id: ActivityId, events: Array[Event], dist: DataStream
 
           val minPause = cleaned.minBy(pauseDuration)
 
-          if (pauseDuration(minPause) > limit) break
+          if (pauseDuration(minPause) > limit) break()
 
           cleaned = cleaned.patch(cleaned.indexOf(minPause), Nil, 1)
         }

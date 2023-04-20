@@ -10,7 +10,7 @@ import com.google.api.client.http.json.JsonHttpContent
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.api.client.json.gson.GsonFactory
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import common.Util._
 import common.model._
 import shared.Timing
@@ -30,19 +30,19 @@ object Main extends common.Formatting {
 
   def digest(str: String): String = digest(str.getBytes)
 
-  case class SecretResult(appId: String, appSecret: String, mapboxToken: String, darkSkySecret: String, error: String)
+  case class SecretResult(appId: String, appSecret: String, mapboxToken: String, error: String)
 
   def secret: SecretResult = {
     val filename = "/secret.txt"
     try {
       val secretStream = Main.getClass.getResourceAsStream(filename)
-      val lines = scala.io.Source.fromInputStream(secretStream).getLines
-      SecretResult(lines.next(), lines.next(), lines.next(), lines.next(), "")
+      val lines = scala.io.Source.fromInputStream(secretStream).getLines()
+      SecretResult(lines.next(), lines.next(), lines.next(), "")
     } catch {
       case _: NullPointerException => // no file found
-        SecretResult("", "", "", "", s"Missing $filename, app developer should check README.md")
+        SecretResult("", "", "", s"Missing $filename, app developer should check README.md")
       case _: Exception =>
-        SecretResult("", "", "", "", s"Bad $filename, app developer should check README.md")
+        SecretResult("", "", "", s"Bad $filename, app developer should check README.md")
     }
   }
 
@@ -59,7 +59,7 @@ object Main extends common.Formatting {
 
   private def buildAuthJson: util.HashMap[String, String] = {
     val json = new util.HashMap[String, String]()
-    val SecretResult(clientId, clientSecret, mapboxToken, _, _) = secret
+    val SecretResult(clientId, clientSecret, mapboxToken, _) = secret
 
     json.put("client_id", clientId)
     json.put("client_secret", clientSecret)
@@ -83,7 +83,7 @@ object Main extends common.Formatting {
 
   def stravaAuth(code: String): StravaAuthResult = {
 
-    val SecretResult(clientId, clientSecret, mapboxToken, _, _) = secret
+    val SecretResult(clientId, clientSecret, mapboxToken, _) = secret
 
     val json = buildAuthJson
     json.put("code", code)
@@ -263,15 +263,15 @@ object Main extends common.Formatting {
 
       private val responseJson = jsonMapper.readTree(response)
 
-      val streams = responseJson.elements.asScala.toIterable
+      val streams = responseJson.elements.asScala.iterator.to(Iterable)
 
-      def getData[T](stream: Stream[JsonNode], get: JsonNode => T): Vector[T] = {
+      def getData[T](stream: LazyList[JsonNode], get: JsonNode => T): Vector[T] = {
         if (stream.isEmpty) Vector()
         else stream.head.path("data").asScala.map(get).toVector
       }
 
       def getDataByName[T](name: String, get: JsonNode => T): Vector[T] = {
-        val stream = streams.filter(_.path("type").textValue == name).toStream
+        val stream = streams.filter(_.path("type").textValue == name).to(LazyList)
         getData(stream, get)
       }
 

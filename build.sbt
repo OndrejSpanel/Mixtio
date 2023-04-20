@@ -4,21 +4,20 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 lazy val commonSettings = Seq(
   organization := "com.github.ondrejspanel",
-  version := "0.4.2-beta",
-  scalaVersion := "2.12.13", // Scala.js 0.6.33 does not exist for 2.12.14
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
-  libraryDependencies += "org.scala-lang.modules" %%% "scala-collection-compat" % "2.2.0"
+  version := "0.5.0",
+  scalaVersion := "2.13.10",
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 )
 
 lazy val jsCommonSettings = Seq(
-  scalacOptions ++= Seq("-P:scalajs:sjsDefinedByDefault")
+  excludeDependencies += ExclusionRule(organization = "io.github.cquiroz") // workaround for https://github.com/cquiroz/scala-java-time/issues/257
 )
 
-val udashVersion = "0.8.2"
+val udashVersion = "0.9.0"
 
 val bootstrapVersion = "4.3.1"
 
-val udashJQueryVersion = "3.0.1"
+val udashJQueryVersion = "3.0.4"
 
 // TODO: try to share
 lazy val jvmLibs = Seq(
@@ -32,8 +31,8 @@ lazy val jvmLibs = Seq(
 
 lazy val jsLibs = libraryDependencies ++= Seq(
   "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
-  "org.scala-js" %%% "scalajs-dom" % "0.9.7",
-  "org.querki" %%% "jquery-facade" % "1.2",
+  "org.scala-js" %%% "scalajs-dom" % "2.4.0",
+  "org.querki" %%% "jquery-facade" % "2.1",
 
   "io.udash" %%% "udash-core" % udashVersion,
   "io.udash" %%% "udash-rest" % udashVersion,
@@ -41,11 +40,10 @@ lazy val jsLibs = libraryDependencies ++= Seq(
   "io.udash" %%% "udash-css" % udashVersion,
 
   "io.udash" %%% "udash-bootstrap4" % udashVersion,
-  "io.udash" %%% "udash-charts" % udashVersion,
   "io.udash" %%% "udash-jquery" % udashJQueryVersion,
 
-  "com.zoepepper" %%% "scalajs-jsjoda" % "1.1.1",
-  "com.zoepepper" %%% "scalajs-jsjoda-as-java-time" % "1.1.1"
+  "com.zoepepper" %%% "scalajs-jsjoda" % "1.2.0",
+  "com.zoepepper" %%% "scalajs-jsjoda-as-java-time" % "1.2.0",
 )
 
 lazy val jsDeps = jsDependencies ++= Seq(
@@ -63,6 +61,7 @@ val jacksonVersion = "2.9.9"
 lazy val sharedJs = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure).in(file("shared-js"))
   .disablePlugins(sbtassembly.AssemblyPlugin)
+  .jsConfigure(_.enablePlugins(JSDependenciesPlugin))
   .settings(commonSettings)
   .jvmSettings(libraryDependencies ++= jvmLibs)
   .jsSettings(
@@ -118,7 +117,7 @@ lazy val frontend = project.settings(
     commonSettings,
     jsCommonSettings,
     jsLibs
-  ).enablePlugins(ScalaJSPlugin)
+  ).enablePlugins(ScalaJSPlugin, JSDependenciesPlugin)
     .dependsOn(sharedJs_JS)
 
 lazy val backend = (project in file("backend"))
@@ -163,9 +162,6 @@ lazy val backend = (project in file("backend"))
 
       "org.slf4j" % "slf4j-simple" % "1.6.1",
       "commons-fileupload" % "commons-fileupload" % "1.3.2",
-      "com.jsuereth" %% "scala-arm" % "2.0" exclude(
-        "org.scala-lang.plugins", "scala-continuations-library_" + scalaBinaryVersion.value
-      ),
       "org.apache.commons" % "commons-math" % "2.1",
       "commons-io" % "commons-io" % "2.1"
     ),

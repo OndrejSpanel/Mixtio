@@ -206,17 +206,7 @@ object Optimize {
         case attr =>
           attr
       }
-      if (attributes.exists(_.attribName == "temp") && (id.sportName == SportId.Swim || !settings.darkSky) ) {
-        copy(attributes = hrFiltered)
-      } else {
-        val temperaturePos = weather.GetTemperature.pickPositions(elevFiltered.gps)
-        if (temperaturePos.nonEmpty) {
-          val temperature = weather.GetTemperature.forPositions(temperaturePos)
-          copy(attributes = temperature +: hrFiltered)
-        } else {
-          copy(attributes = hrFiltered)
-        }
-      }
+      copy(attributes = hrFiltered)
     }
 
 
@@ -259,8 +249,8 @@ object Optimize {
           // found gps data for given distance
           def gpsWithDistance(d: Double): GPSPoint = {
             val get = for {
-              prev <- gpsByDistance.to(d).lastOption
-              next <- gpsByDistance.from(d).headOption
+              prev <- gpsByDistance.rangeTo(d).lastOption
+              next <- gpsByDistance.rangeFrom(d).headOption
             } yield {
               def vecFromGPS(g: GPSPoint) = Vector2(g.latitude, g.longitude)
 

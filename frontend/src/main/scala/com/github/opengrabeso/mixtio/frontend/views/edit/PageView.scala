@@ -18,7 +18,7 @@ import io.udash.component.ComponentId
 class PageView(
   model: ModelProperty[PageModel],
   presenter: PagePresenter,
-) extends FinalView with CssView with PageUtils with ActivityLink {
+) extends View with CssView with PageUtils with ActivityLink {
   val s = EditPageStyles
 
   model.subProp(_.routeJS).listen {

@@ -41,9 +41,9 @@ case class UploadResultToStrava(auth: Main.StravaAuthResult, sessionId: String) 
 
     for (upload <- Storage.load2nd[ActivityEvents](Storage.getFullName(uploadNamespace, key, auth.userId))) {
 
-      val export = FitExport.export(upload)
+      val `export` = FitExport.export(upload)
 
-      val ret = api.uploadRawFileGz(export, "fit.gz")
+      val ret = api.uploadRawFileGz(`export`, "fit.gz")
 
       Storage.store(Storage.FullName(uploadResultNamespace, key, auth.userId), ret)
       ret match {

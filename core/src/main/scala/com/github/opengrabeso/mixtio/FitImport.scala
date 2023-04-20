@@ -37,7 +37,7 @@ object FitImport {
       val cadenceBuffer = ArrayBuffer[(ZonedDateTime, Int)]()
       val powerBuffer = ArrayBuffer[(ZonedDateTime, Int)]()
       val distanceBuffer = ArrayBuffer[(ZonedDateTime, Double)]()
-      val lapBuffer=ArrayBuffer[ZonedDateTime]()
+      val lapBuffer = ArrayBuffer[ZonedDateTime]()
 
       case class FitHeader(sport: Option[Event.Sport] = None)
 
@@ -111,14 +111,14 @@ object FitImport {
 
       decode.read(in, listener)
 
-      val gpsStream = SortedMap(gpsBuffer:_*)
-      val hrStream = SortedMap(hrBuffer:_*)
-      val powerStream = SortedMap(powerBuffer:_*)
-      val cadenceStream = SortedMap(cadenceBuffer:_*)
+      val gpsStream = SortedMap.from(gpsBuffer)
+      val hrStream = SortedMap.from(hrBuffer)
+      val powerStream = SortedMap.from(powerBuffer)
+      val cadenceStream = SortedMap.from(cadenceBuffer)
 
       val gpsDataStream = new DataStreamGPS(gpsStream)
       val distData = if (distanceBuffer.nonEmpty) {
-        SortedMap(distanceBuffer:_*)
+        SortedMap.from(distanceBuffer)
       } else {
         val distanceDeltas = gpsDataStream.distStream
 
@@ -148,7 +148,7 @@ object FitImport {
 
       }
 
-      Some(ActivityEvents.processActivityStream(id, ImportedStreams, lapBuffer, Nil))
+      Some(ActivityEvents.processActivityStream(id, ImportedStreams, lapBuffer.toSeq, Nil))
 
     } catch {
       case ex: Exception =>

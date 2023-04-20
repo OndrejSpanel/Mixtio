@@ -40,11 +40,11 @@ object RestAPIServer extends RestAPI with RestAPIUtils {
         a
       } else {
         if (logging) println("Provided auth token does not match")
-        throw HttpErrorException(401, s"Provided auth token '$authToken' does not match the one stored on the server")
+        throw HttpErrorException.plain(401, s"Provided auth token '$authToken' does not match the one stored on the server")
       }
     }.getOrElse {
       if (logging) println("User ID not authenticated")
-      throw HttpErrorException(401, "User ID not authenticated. Page reload may be necessary.")
+      throw HttpErrorException.plain(401, "User ID not authenticated. Page reload may be necessary.")
     }
   }
   def userAPI(userId: String, authToken: String, session: String): UserRestAPI = {

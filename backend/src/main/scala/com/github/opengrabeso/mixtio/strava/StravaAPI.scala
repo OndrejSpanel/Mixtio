@@ -7,7 +7,6 @@ import java.util.zip.GZIPOutputStream
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.google.api.client.http._
-import resource.managed
 import common.Util._
 import requests._
 
@@ -79,8 +78,12 @@ class StravaAPI(authString: String) {
   def uploadRawFileGz(moveBytesOriginal: Array[Byte], fileType: String): UploadStatus = {
 
     val baos = new ByteArrayOutputStream()
-    managed(new GZIPOutputStream(baos)).foreach(_.write(moveBytesOriginal))
-
+    val zipStream = new GZIPOutputStream(baos)
+    try {
+      zipStream.write(moveBytesOriginal)
+    } finally {
+      zipStream.close()
+    }
     uploadRawFile(baos.toByteArray, fileType)
   }
 

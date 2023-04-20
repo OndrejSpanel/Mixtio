@@ -9,6 +9,7 @@ import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 import io.udash.rest.RestServlet
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.{ServletContextHandler, ServletHolder}
+import monix.execution.Scheduler.Implicits.global
 
 object DevServer {
   val portNumber = System.getenv.getOrDefault("PORT", "8080").toInt

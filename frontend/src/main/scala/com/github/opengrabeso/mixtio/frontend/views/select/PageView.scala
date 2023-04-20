@@ -21,7 +21,7 @@ import org.scalajs.dom
 class PageView(
   model: ModelProperty[PageModel],
   presenter: PagePresenter,
-) extends FinalView with CssView with PageUtils with TimeFormatting with ActivityLink {
+) extends View with CssView with PageUtils with TimeFormatting with ActivityLink {
   val s = SelectPageStyles
 
   private val uploadButton = UdashButton()(_ => "Upload activity data...")
@@ -84,7 +84,7 @@ class PageView(
   ))
 
   private val uploadShowHideButton = UdashButton(
-    buttonStyle = Color.Primary.toProperty
+    options = Color.Primary.option
   )(_ => Seq[Modifier](collapse.toggleButtonAttrs(), "Upload..."))
 
   buttonOnClick(uploadShowHideButton) {collapse.toggle()}
