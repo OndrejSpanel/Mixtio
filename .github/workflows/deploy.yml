@@ -33,5 +33,5 @@ jobs:
           export_default_credentials: true
       - name: Deploy to GCloud
         run: |
-          gcloud app deploy --quiet --project mixtio backend/target/scala-2.12/mixtio.jar --appyaml=backend/web/WEB-INF/app.yaml
+          gcloud app deploy --quiet --project mixtio backend/target/scala-2.13/mixtio.jar --appyaml=backend/web/WEB-INF/app.yaml
           gcloud app deploy --quiet --project mixtio backend/web/WEB-INF/cron.yaml
