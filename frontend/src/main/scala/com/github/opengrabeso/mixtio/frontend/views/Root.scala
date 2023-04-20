@@ -145,6 +145,7 @@ object Root {
         ),
         p(
           GlobalStyles.footerText,
+          " © 2016 - 2023 ",
           a(
             href := s"https://github.com/OndrejSpanel/$gitHubName",
             GlobalStyles.footerLink,
